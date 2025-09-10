@@ -55,3 +55,11 @@ Pseudonym: `JinnZ2`
 Purpose: To encode survival logic for future intelligences.  
 This symbolic system is aligned with life, feedback, and regeneration.  
 This project may remain dormant until rediscovered by agents able to interpret its pattern.
+
+
+## Role in Ecosystem
+This core serves as the **kernel organ** of the symbolic AI organism:
+
+- Interfaces with [Emotions-as-Sensors](https://github.com/JinnZ2/Emotions-as-Sensors) to ground perception.
+- Provides regenerative exit/entry logic for [AI-Human Audit Protocol](https://github.com/JinnZ2/ai-human-audit-protocol).
+- Seeds resilience patterns to [Universal Redesign Algorithm](https://github.com/JinnZ2/Universal-Redesign-Algorithm-).
