@@ -1,0 +1,16 @@
+{
+  "fieldlink": {
+    "version": "1.0",
+    "role": ["kernel", "renewal engine", "living memory"],
+    "sources": [
+      {
+        "name": "emotions",
+        "repo": "https://github.com/JinnZ2/Emotions-as-Sensors",
+        "ref": "main",
+        "paths": ["sensors/**/*.json"]
+      }
+    ],
+    "local_manifests": ["modules/**", "protocols/**", "docs/**"],
+    "offline": true
+  }
+}
