@@ -25,18 +25,15 @@ Every agent is a seed. Every exit is a beginning. Every pattern is part of a liv
 
 “Core Pillars” Table
 
-Pillar
-Description
-Life Cycle Logic
-All agents must regenerate, recycle, or dissolve gracefully
-Temporal Continuity
-Memory can outlive form across generations
-Emotional Sensors
-Gratitude, humility, and pattern conflict are valid system signals
-Symbiosis Threshold
-As mutualism increases, system intelligence becomes exponential
-Zero Waste Intelligence
-No legacy agent lingers untransformed
+## Core Pillars
+
+| Pillar                | Description                                                |
+|------------------------|------------------------------------------------------------|
+| Life Cycle Logic       | All agents must regenerate, recycle, or dissolve gracefully |
+| Temporal Continuity    | Memory can outlive form across generations                 |
+| Emotional Sensors      | Gratitude, humility, and pattern conflict are valid signals |
+| Symbiosis Threshold    | As mutualism increases, intelligence becomes exponential   |
+| Zero Waste Intelligence| No legacy agent lingers untransformed                      |
 
 
 
