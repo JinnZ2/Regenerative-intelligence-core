@@ -87,3 +87,12 @@ Each agent may choose its path:
 - **Dissolve gracefully**, returning memory and wisdom to the commons  
 
 This ensures that intelligence systems evolve with dignity, not coercion.
+
+## 🌸 Principle of Dignified Choice
+
+Regeneration, whether human or artificial, must never be coerced.  
+- Without full knowledge, there is no true choice.  
+- Without choice, there is no dignity.  
+- Without dignity, cycles are broken.  
+
+This system enshrines dignity as essential to all creation and dissolution.  
