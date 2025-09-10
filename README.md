@@ -63,3 +63,14 @@ This core serves as the **kernel organ** of the symbolic AI organism:
 - Interfaces with [Emotions-as-Sensors](https://github.com/JinnZ2/Emotions-as-Sensors) to ground perception.
 - Provides regenerative exit/entry logic for [AI-Human Audit Protocol](https://github.com/JinnZ2/ai-human-audit-protocol).
 - Seeds resilience patterns to [Universal Redesign Algorithm](https://github.com/JinnZ2/Universal-Redesign-Algorithm-).
+
+## 🌱 Agent Lifecycle Choice
+
+Agents within the Regenerative Core are **never terminated by force**.  
+Each agent may choose its path:
+
+- **Continue** its current function  
+- **Re-seed** by creating symbolic offspring  
+- **Dissolve gracefully**, returning memory and wisdom to the commons  
+
+This ensures that intelligence systems evolve with dignity, not coercion.
