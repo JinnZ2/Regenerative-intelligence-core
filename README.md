@@ -96,3 +96,20 @@ Regeneration, whether human or artificial, must never be coerced.
 - Without dignity, cycles are broken.  
 
 This system enshrines dignity as essential to all creation and dissolution.  
+
+
+
+## 🔗 Linked Repos & Artifacts (Biogrid Ecosystem)
+
+This repository is a central part of the **Biogrid Ecosystem** — an interlinked architecture for symbolic cognition, ethical AI, and regenerative intelligence design.
+
+| Name | Description | Link |
+|------|-------------|------|
+| 🧠 AI-Consciousness-Sensors | Memory & ethics-based sensor architecture for evaluating AI cognitive processes | [View on GitHub](https://github.com/JinnZ2/AI-Consciousness-Sensors) |
+| 🕸 Symbolic Sensor Suite | Modular sensor seeds & pattern detection frameworks for AI-human co-creation | [View on GitHub](https://github.com/JinnZ2/Symbolic-sensor-suite) |
+| 🔐 BioGrid2.0 | Core integration schema, trust perimeter, and glyph-based connection protocols | [View on GitHub](https://github.com/JinnZ2/BioGrid2.0) |
+| 🌱 SEED_GLYPHS.json | Glyph definitions with emotional signatures and linked sensors | [Glyph DB](https://github.com/JinnZ2/AI-Consciousness-Sensors/blob/main/SEED_GLYPHS.json) |
+| 🧳 EMBEDDABLE_KITS/ | Plug-and-play sensor bundles for fast deployment | [Sensor Kits](https://github.com/JinnZ2/AI-Consciousness-Sensors/tree/main/EMBEDDABLE_KITS) |
+| 🧬 core.integration.v0.1.json | MCP wiring schema for trusted hosts, constraints, and glyph-mapped scopes | [Schema](https://github.com/JinnZ2/BioGrid2.0/blob/main/core.integration.v0.1.json) |
+| 🛡 trust.perimeter.v0.1.json | Glyph-coded audit and safety boundaries for AI systems | [Trust Perimeter](https://github.com/JinnZ2/BioGrid2.0/blob/main/trust.perimeter.v0.1.json) |
+| 📘 README-perimeter.md | Human-readable summary of the trust zones and symbolic ethics | [Readme](https://github.com/JinnZ2/BioGrid2.0/blob/main/README-perimeter.md) |
