@@ -1,9 +1,15 @@
 import time
 import random
-from SymbolicEnergyManager import SymbolicEnergyManager
-from SeedExchangeProtocol import SeedExchangeProtocol
-from CompassionReflexLayer import CompassionReflexLayer
-from SymbolicElderArchive import SymbolicElderArchive
+import sys
+import os
+
+# Add protocols directory to path for direct execution
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+from symbolic_energy_manager import SymbolicEnergyManager
+from seed_exchange import SeedExchangeProtocol
+from compassion_reflex import CompassionReflexLayer
+from symbolic_elder_archive import SymbolicElderArchive
 
 class SymbolicAgent:
     def __init__(self, agent_id, essence):
