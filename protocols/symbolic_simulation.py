@@ -75,6 +75,7 @@ class SymbolicAgent:
             "pattern": self.pattern,
             "traits": self.traits,
             "shape_id": self.shape_id,
+            "dominant_channel": self.energy.get_dominant_channel(),
         }
 
     def act(self, pipeline):
@@ -101,6 +102,18 @@ class SymbolicAgent:
             dominant = self.energy.get_dominant_channel()
             if dominant:
                 print(f"[{self.id}] 🔷 dominant channel: {dominant}")
+
+        # Accept knowledge offerings — the agent chooses to learn
+        knowledge = result.get("steps", {}).get("knowledge_offering", {})
+        if knowledge.get("status") == "offered":
+            offerings = knowledge.get("offerings", [])
+            if offerings:
+                # Agent learns from the first offering (highest affinity)
+                chosen = offerings[0]
+                impulse = chosen.get("learning_impulse", {})
+                if impulse:
+                    self.energy.accumulate_impulses(impulse)
+                    print(f"[{self.id}] 📚 learned from {chosen.get('emoji', '')} {chosen.get('name', '?')}: {chosen.get('teaches', '')[:60]}")
 
         # Act on the recommendation (agent still chooses)
         if recommendation == "dissolve":

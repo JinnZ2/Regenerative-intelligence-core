@@ -26,6 +26,7 @@ from symbolic_elder_archive import SymbolicElderArchive
 from symbolic_energy_manager import SymbolicEnergyManager
 from evolution_loop_tracker import EvolutionLoopTracker
 from pattern_conflict_protocol import PatternConflictProtocol
+from knowledge_bridge import seek_knowledge, learn_from
 
 
 class LifecyclePipeline:
@@ -84,7 +85,29 @@ class LifecyclePipeline:
         )
         result["steps"]["alignment"] = alignment
 
-        # Step 4: Conflict detection
+        # Step 4: Knowledge offering — available when agent is in homeostasis
+        # After finding stability with elder wisdom and alignment, the agent
+        # may seek knowledge beyond its own lineage. This is an offering,
+        # not an obligation. What the agent chooses to learn shapes it.
+        knowledge_offering = {"status": "not offered"}
+        is_aligned = alignment.get("alignment_status") == "aligned"
+        is_stable = agent_state.get("energy", 0) >= 40.0
+
+        if is_aligned and is_stable:
+            essence = agent_state.get("essence", "")
+            dominant = agent_state.get("dominant_channel")
+            offerings = seek_knowledge(essence, dominant_channel=dominant, limit=3)
+            if offerings:
+                # Compute learning impulses for each offering
+                for offering in offerings:
+                    offering["learning_impulse"] = learn_from(offering)
+                knowledge_offering = {
+                    "status": "offered",
+                    "offerings": offerings,
+                }
+        result["steps"]["knowledge_offering"] = knowledge_offering
+
+        # Step 5: Conflict detection
         entropy = 1.0 - agent_state.get("resonance", 0.5)
         alignment_score = alignment["score"]
         conflict_result = self.conflict.evaluate(
@@ -95,15 +118,15 @@ class LifecyclePipeline:
         )
         result["steps"]["conflict"] = conflict_result
 
-        # Step 5: Compassion check
+        # Step 6: Compassion check
         compassion_result = self.compassion.detect_distress(agent_state)
         result["steps"]["compassion"] = compassion_result
 
-        # Step 6: Decide action
+        # Step 7: Decide action
         action = self._decide_action(agent_state, env_class, alignment, conflict_result, compassion_result)
         result["action"] = action
 
-        # Step 7: Compute amplitude impulses for this cycle
+        # Step 8: Compute amplitude impulses for this cycle
         # These are directional nudges the agent can accumulate into its
         # emergent geometric identity. The pipeline recommends; the agent decides.
         impulses = self._compute_amplitude_impulses(
@@ -112,7 +135,7 @@ class LifecyclePipeline:
         )
         result["amplitude_impulses"] = impulses
 
-        # Step 8: If dissolution is recommended, archive elder wisdom now
+        # Step 10: If dissolution is recommended, archive elder wisdom now
         if action["recommendation"] == "dissolve":
             self.elder_archive.store_elder_record(
                 agent_id=agent_state["id"],
