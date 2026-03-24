@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "protocols"))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "Modules"))
 
 from rosetta_bridge import (
-    get_seed, select_by_traits, resonance, seed_traits_vector,
+    get_seed, select_by_traits, select_by_essence, resonance, seed_traits_vector,
     all_shape_ids, geometry_for_shape, traits_for_essence, is_rosetta_available,
 )
 
@@ -59,6 +59,57 @@ class TestSelectByTraits(unittest.TestCase):
         self.assertIn("SHAPE.TETRA", shape_ids)
 
 
+class TestSelectByEssence(unittest.TestCase):
+    """Test the direct essence → shape lookup."""
+
+    def test_guardian_resolves_to_tetra(self):
+        results = select_by_essence("guardian")
+        self.assertTrue(len(results) > 0)
+        self.assertEqual(results[0]["shape_id"], "SHAPE.TETRA")
+
+    def test_observer_resolves_to_octa(self):
+        results = select_by_essence("observer")
+        self.assertTrue(len(results) > 0)
+        self.assertEqual(results[0]["shape_id"], "SHAPE.OCTA")
+
+    def test_explorer_resolves_to_icosa(self):
+        results = select_by_essence("explorer")
+        self.assertTrue(len(results) > 0)
+        self.assertEqual(results[0]["shape_id"], "SHAPE.ICOSA")
+
+    def test_builder_resolves_to_cube(self):
+        results = select_by_essence("builder")
+        self.assertTrue(len(results) > 0)
+        self.assertEqual(results[0]["shape_id"], "SHAPE.CUBE")
+
+    def test_weaver_resolves_to_dodeca(self):
+        results = select_by_essence("weaver")
+        self.assertTrue(len(results) > 0)
+        self.assertEqual(results[0]["shape_id"], "SHAPE.DODECA")
+
+    def test_unknown_essence_returns_trait_matches(self):
+        """Unknown essence should still return trait-based matches via fallback."""
+        results = select_by_essence("healer")
+        # traits_for_essence("healer") returns ["stability"],
+        # which matches tetra
+        shape_ids = [r["shape_id"] for r in results]
+        self.assertIn("SHAPE.TETRA", shape_ids)
+
+    def test_case_insensitive(self):
+        r1 = select_by_essence("Guardian")
+        r2 = select_by_essence("guardian")
+        self.assertEqual(r1[0]["shape_id"], r2[0]["shape_id"])
+
+    def test_primary_match_comes_first(self):
+        """Primary match should always be first, trait matches follow."""
+        results = select_by_essence("guardian")
+        # Guardian → SHAPE.TETRA (primary), then trait matches
+        self.assertEqual(results[0]["shape_id"], "SHAPE.TETRA")
+        # Should have secondary matches too (traits like "stability" appear elsewhere)
+        if len(results) > 1:
+            self.assertNotEqual(results[1]["shape_id"], "SHAPE.TETRA")
+
+
 class TestResonance(unittest.TestCase):
 
     def test_identical_shapes_perfect_resonance(self):
@@ -69,10 +120,10 @@ class TestResonance(unittest.TestCase):
         score = resonance("SHAPE.TETRA", "SHAPE.ICOSA")
         self.assertLess(score, 1.0)
 
-    def test_no_overlap_zero_resonance(self):
+    def test_no_overlap_no_topology_zero(self):
         # Tetra families: stability, foundation, structure
         # Icosa families: flow, adaptation, empathy
-        # No overlap → 0.0
+        # No trait overlap AND no duality/bridge connection → 0.0
         score = resonance("SHAPE.TETRA", "SHAPE.ICOSA")
         self.assertAlmostEqual(score, 0.0, places=2)
 
@@ -85,6 +136,51 @@ class TestResonance(unittest.TestCase):
             resonance("SHAPE.TETRA", "SHAPE.CUBE"),
             resonance("SHAPE.CUBE", "SHAPE.TETRA")
         )
+
+
+class TestDualityTopology(unittest.TestCase):
+    """Test polyhedral duality bonuses in resonance."""
+
+    def test_cube_octa_duality_bonus(self):
+        """Cube and octahedron are duals — should get duality bonus."""
+        score = resonance("SHAPE.CUBE", "SHAPE.OCTA")
+        # No trait overlap (order/containment/protection vs balance/mediation/air)
+        # but duality bonus of 0.15
+        self.assertAlmostEqual(score, 0.15, places=2)
+
+    def test_dodeca_icosa_duality_bonus(self):
+        """Dodecahedron and icosahedron are duals."""
+        score = resonance("SHAPE.DODECA", "SHAPE.ICOSA")
+        # No trait overlap + duality bonus
+        self.assertAlmostEqual(score, 0.15, places=2)
+
+    def test_tetra_cube_bridge_bonus(self):
+        """Tetra and cube are bridge-connected (stability ground)."""
+        score = resonance("SHAPE.TETRA", "SHAPE.CUBE")
+        # No trait overlap but bridge bonus of 0.08
+        self.assertAlmostEqual(score, 0.08, places=2)
+
+    def test_tetra_dodeca_bridge_bonus(self):
+        """Tetra and dodeca are bridge-connected (boundary/cosmos)."""
+        score = resonance("SHAPE.TETRA", "SHAPE.DODECA")
+        self.assertAlmostEqual(score, 0.08, places=2)
+
+    def test_no_topology_no_bonus(self):
+        """Tetra and icosa have no topology connection — pure Jaccard only."""
+        score = resonance("SHAPE.TETRA", "SHAPE.ICOSA")
+        self.assertAlmostEqual(score, 0.0, places=2)
+
+    def test_duality_bonus_higher_than_bridge(self):
+        """Duality connection should resonate more strongly than bridge."""
+        dual_score = resonance("SHAPE.CUBE", "SHAPE.OCTA")
+        bridge_score = resonance("SHAPE.TETRA", "SHAPE.CUBE")
+        self.assertGreater(dual_score, bridge_score)
+
+    def test_resonance_capped_at_one(self):
+        """Even with bonus, resonance should never exceed 1.0."""
+        # Identical shapes already at 1.0, should stay there
+        score = resonance("SHAPE.TETRA", "SHAPE.TETRA")
+        self.assertLessEqual(score, 1.0)
 
 
 class TestTraitsVector(unittest.TestCase):

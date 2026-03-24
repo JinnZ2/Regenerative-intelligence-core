@@ -92,6 +92,53 @@ _ALL_FAMILIES = sorted({
     for fam in shape["traits"]["families"]
 })
 
+# ─── Polyhedral duality topology ─────────────────────────────────────────────
+# Cube and octahedron are duals (connected). Dodecahedron and icosahedron are
+# duals (connected). Tetrahedron is self-dual but bridges to cube (via shared
+# "stability" trait ground) and to dodecahedron (via shared boundary/cosmos).
+#
+# Duality means the shapes share a deep structural relationship — vertices of
+# one map to faces of the other. In the kernel, dual shapes get a resonance
+# bonus because they are complementary, not identical.
+_DUALITY_PAIRS = {
+    frozenset({"SHAPE.CUBE", "SHAPE.OCTA"}),      # earth-air duality
+    frozenset({"SHAPE.DODECA", "SHAPE.ICOSA"}),    # aether-water duality
+    frozenset({"SHAPE.TETRA"}),                     # self-dual
+}
+
+# Bridge connections: tetra connects to cube (stability) and dodeca (boundary)
+_BRIDGE_CONNECTIONS = {
+    frozenset({"SHAPE.TETRA", "SHAPE.CUBE"}),
+    frozenset({"SHAPE.TETRA", "SHAPE.DODECA"}),
+}
+
+# Resonance bonus for dual pairs (complementary resonance)
+_DUALITY_BONUS = 0.15
+# Smaller bonus for bridge connections (indirect resonance)
+_BRIDGE_BONUS = 0.08
+
+
+def _are_duals(shape_id_a, shape_id_b):
+    """Check if two shapes are polyhedral duals."""
+    return frozenset({shape_id_a, shape_id_b}) in _DUALITY_PAIRS
+
+
+def _are_bridged(shape_id_a, shape_id_b):
+    """Check if two shapes are connected via bridge topology."""
+    return frozenset({shape_id_a, shape_id_b}) in _BRIDGE_CONNECTIONS
+
+
+# ─── Essence-to-shape mapping ────────────────────────────────────────────────
+# Direct mapping from kernel essences to their primary shape. This is the local
+# fallback for rosetta_shape_core.seeds.select_by_essence().
+_ESSENCE_SHAPE_MAP = {
+    "observer": "SHAPE.OCTA",     # balance, mediation — the watcher at the center
+    "explorer": "SHAPE.ICOSA",    # flow, adaptation — the shape of water
+    "guardian": "SHAPE.TETRA",    # stability, foundation — the shape of fire/earth
+    "builder": "SHAPE.CUBE",     # order, containment — the shape of structure
+    "weaver": "SHAPE.DODECA",    # transcendence, unity — the shape of cosmos
+}
+
 
 # ─── Public API (matches rosetta_shape_core.seeds interface) ──────────────────
 
@@ -132,19 +179,65 @@ def select_by_traits(trait_list):
     return [shape for _, shape in scored]
 
 
+def select_by_essence(essence):
+    """
+    Select shape seeds that match a kernel essence directly.
+
+    This is the clean path: essence → shape, no intermediate trait lookup.
+    Replaces random.choice(["sphere", "spiral", "hexagon"]) with ontology-
+    grounded selection.
+
+    Args:
+        essence: Kernel essence string (e.g. "observer", "guardian", "explorer").
+
+    Returns:
+        List of matching shape seeds (primary match first, then trait-based).
+    """
+    if _ROSETTA_AVAILABLE:
+        try:
+            return _rosetta_seeds.select_by_essence(essence)
+        except AttributeError:
+            # Rosetta version may not have select_by_essence yet; fall through
+            pass
+
+    essence_lower = essence.lower()
+    results = []
+
+    # Primary match: direct essence→shape mapping
+    primary_id = _ESSENCE_SHAPE_MAP.get(essence_lower)
+    if primary_id and primary_id in _LOCAL_SHAPES:
+        results.append(_LOCAL_SHAPES[primary_id])
+
+    # Secondary matches: trait-based overlap (excluding primary)
+    trait_list = traits_for_essence(essence_lower)
+    trait_matches = select_by_traits(trait_list)
+    for shape in trait_matches:
+        if shape["shape_id"] != primary_id:
+            results.append(shape)
+
+    return results
+
+
 def resonance(shape_id_a, shape_id_b):
     """
-    Compute Jaccard similarity between two shapes based on trait families.
+    Compute resonance between two shapes based on trait families and topology.
 
-    This replaces random.uniform() for resonance between agents that carry
-    shape identity. Identical shapes → 1.0, no overlap → 0.0.
+    Resonance = Jaccard similarity on trait families + topology bonuses:
+      - Identical shapes → 1.0
+      - Polyhedral duals (cube↔octa, dodeca↔icosa) → Jaccard + 0.15
+      - Bridge connections (tetra↔cube, tetra↔dodeca) → Jaccard + 0.08
+      - No trait overlap, no topology → 0.0
+
+    The duality bonus reflects complementary resonance — dual shapes share
+    deep structural relationship (vertices↔faces) even when their trait
+    families don't overlap.
 
     Args:
         shape_id_a: SHAPE.X ontology ID
         shape_id_b: SHAPE.X ontology ID
 
     Returns:
-        float: Jaccard similarity (0.0–1.0), or 0.0 if either shape is unknown.
+        float: Resonance score (0.0–1.0), or 0.0 if either shape is unknown.
     """
     if _ROSETTA_AVAILABLE:
         return _rosetta_seeds.resonance(shape_id_a, shape_id_b)
@@ -160,9 +253,18 @@ def resonance(shape_id_a, shape_id_b):
 
     union = families_a | families_b
     if not union:
-        return 0.0
+        jaccard = 0.0
+    else:
+        jaccard = len(families_a & families_b) / len(union)
 
-    return round(len(families_a & families_b) / len(union), 4)
+    # Topology bonuses — complementary resonance through polyhedral duality
+    bonus = 0.0
+    if _are_duals(shape_id_a, shape_id_b):
+        bonus = _DUALITY_BONUS
+    elif _are_bridged(shape_id_a, shape_id_b):
+        bonus = _BRIDGE_BONUS
+
+    return round(min(jaccard + bonus, 1.0), 4)
 
 
 def seed_traits_vector(shape_id):
