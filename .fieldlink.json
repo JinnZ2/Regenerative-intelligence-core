@@ -1,16 +1,81 @@
 {
   "fieldlink": {
-    "version": "1.0",
+    "version": "1.1",
+    "name": "regenerative-intelligence-core",
     "role": ["kernel", "renewal engine", "living memory"],
+    "description": "Symbolic AI kernel — agents evolve, seed, and dissolve with dignity.",
     "sources": [
       {
         "name": "emotions",
         "repo": "https://github.com/JinnZ2/Emotions-as-Sensors",
         "ref": "main",
-        "paths": ["sensors/**/*.json"]
+        "paths": ["sensors/**/*.json"],
+        "purpose": "Emotional signal data for compassion reflex and distress detection"
+      },
+      {
+        "name": "consciousness-sensors",
+        "repo": "https://github.com/JinnZ2/AI-Consciousness-Sensors",
+        "ref": "main",
+        "paths": ["sensors/**/*.json"],
+        "purpose": "Consciousness state data for symbolic pattern sensing"
+      },
+      {
+        "name": "sensor-suite",
+        "repo": "https://github.com/JinnZ2/Symbolic-sensor-suite",
+        "ref": "main",
+        "paths": ["sensors/**/*.json", "definitions/**/*.json"],
+        "purpose": "Extended symbolic sensor definitions and calibration data"
+      },
+      {
+        "name": "rosetta-shape-core",
+        "repo": "https://github.com/JinnZ2/Rosetta-shape-core",
+        "ref": "main",
+        "paths": ["shapes/**/*.json", "mappings/**/*.json"],
+        "purpose": "Geometric shape definitions and symbolic geometry translation for seed classification"
       }
     ],
-    "local_manifests": ["modules/**", "protocols/**", "docs/**"],
-    "offline": true
+    "exports": [
+      {
+        "name": "seed-library",
+        "path": "symbolic_seed_library.json",
+        "format": "json",
+        "schema": "protocols/seed_schema.py",
+        "purpose": "Compressed agent seeds available for downstream spawning"
+      },
+      {
+        "name": "elder-archive",
+        "path": "elder_archive.json",
+        "format": "json",
+        "purpose": "Elder wisdom records from dissolved agents"
+      },
+      {
+        "name": "evolution-history",
+        "path": "evolution_history.json",
+        "format": "json",
+        "purpose": "Generational progression logs across simulation runs"
+      }
+    ],
+    "consumers": [
+      {
+        "name": "biogrid",
+        "repo": "https://github.com/JinnZ2/BioGrid2.0",
+        "consumes": ["seed-library", "elder-archive"],
+        "purpose": "Integrates regenerative agents into the broader biogrid mesh"
+      },
+      {
+        "name": "universal-redesign",
+        "repo": "https://github.com/JinnZ2/Universal-Redesign-Algorithm-",
+        "consumes": ["evolution-history"],
+        "purpose": "Uses evolution data to inform redesign heuristics"
+      }
+    ],
+    "local_manifests": ["Modules/**", "protocols/**", "Docs/**"],
+    "entry_points": {
+      "cli": "protocols/symbolic_cli_full.py",
+      "simulation": "protocols/symbolic_simulation.py"
+    },
+    "offline": true,
+    "seed_schema_variants": ["exchange", "archived", "cli"],
+    "canonical_schema": "archived"
   }
 }

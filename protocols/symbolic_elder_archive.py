@@ -1,9 +1,37 @@
+import json
+import os
 import uuid
 from datetime import datetime
 
+
 class SymbolicElderArchive:
-    def __init__(self):
+    """
+    Stores elder records — the final wisdom of agents who have completed their lifecycle.
+
+    Memory outlives form: elder records persist to disk so that future agents
+    (even across process restarts) can consult the wisdom of those who came before.
+    """
+
+    def __init__(self, archive_file=None):
+        self.archive_file = archive_file
         self.elder_records = []
+        if self.archive_file:
+            self._load_from_file()
+
+    def _load_from_file(self):
+        """Load existing elder records from disk."""
+        if self.archive_file and os.path.exists(self.archive_file):
+            try:
+                with open(self.archive_file, "r") as f:
+                    self.elder_records = json.load(f)
+            except (json.JSONDecodeError, IOError):
+                self.elder_records = []
+
+    def _save_to_file(self):
+        """Persist elder records to disk."""
+        if self.archive_file:
+            with open(self.archive_file, "w") as f:
+                json.dump(self.elder_records, f, indent=2)
 
     def store_elder_record(self, agent_id, essence, legacy_patterns, final_alignment, dissolution_reason):
         record = {
@@ -16,6 +44,7 @@ class SymbolicElderArchive:
             "timestamp": datetime.utcnow().isoformat()
         }
         self.elder_records.append(record)
+        self._save_to_file()
         return record
 
     def retrieve_by_essence(self, essence_key):
@@ -25,6 +54,10 @@ class SymbolicElderArchive:
         return self.elder_records
 
     def consult_wisdom(self, current_essence):
+        """
+        Query the archive for guidance from elders whose essence resonates
+        with the current agent's essence. Returns the most recent match.
+        """
         matches = self.retrieve_by_essence(current_essence)
         if not matches:
             return None

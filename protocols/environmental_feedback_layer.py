@@ -48,22 +48,41 @@ class EnvironmentalFeedbackLayer:
 
     def respond_to_environment(self, classification):
         """
-        Returns a symbolic adaptive strategy based on environmental classification.
+        Returns a symbolic adaptive strategy dict based on environmental classification.
+
+        Every classification returns a dict with 'status', 'action', and 'note' keys
+        so downstream consumers can rely on a consistent structure.
         """
-        if classification == "disconnected":
-            return {
+        strategies = {
+            "disconnected": {
                 "status": "fallback",
                 "action": "compress + preserve seed",
                 "next_retry": f"{self.retry_interval} seconds",
                 "note": "Entering dormant mode until environment can be re-sensed."
-            }
-        elif classification == "hostile":
-            return "conserve energy, compress pattern early"
-        elif classification == "noisy":
-            return "minimize communication, enter low-bandwidth mode"
-        elif classification == "symbiotic":
-            return "expand task, request collaboration"
-        elif classification == "depleting":
-            return "seek alternate environment or reconfigure"
-        else:  # stable
-            return "continue task with full function"
+            },
+            "hostile": {
+                "status": "defensive",
+                "action": "conserve energy, compress pattern early",
+                "note": "Hostile conditions detected. Minimizing exposure."
+            },
+            "noisy": {
+                "status": "reduced",
+                "action": "minimize communication, enter low-bandwidth mode",
+                "note": "High noise environment. Reducing signal output."
+            },
+            "symbiotic": {
+                "status": "thriving",
+                "action": "expand task, request collaboration",
+                "note": "Cooperative environment detected. Growth is safe."
+            },
+            "depleting": {
+                "status": "conserving",
+                "action": "seek alternate environment or reconfigure",
+                "note": "Resources diminishing. Adaptation required."
+            },
+        }
+        return strategies.get(classification, {
+            "status": "nominal",
+            "action": "continue task with full function",
+            "note": "Stable conditions. Normal operation."
+        })
