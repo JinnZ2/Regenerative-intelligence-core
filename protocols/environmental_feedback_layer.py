@@ -1,6 +1,9 @@
 import random
 import time
 
+from sensor_bridge import sense_domains
+
+
 class EnvironmentalFeedbackLayer:
     def __init__(self, entropy_threshold=0.75, cooperation_threshold=0.6, retry_interval=30):
         self.status_tags = ["stable", "noisy", "symbiotic", "hostile", "depleting", "disconnected"]
@@ -8,13 +11,34 @@ class EnvironmentalFeedbackLayer:
         self.cooperation_threshold = cooperation_threshold
         self.retry_interval = retry_interval  # seconds to wait before retrying sense
 
-    def sense_environment(self):
+    def sense_environment(self, domain_data=None):
         """
-        Simulates feedback sensing from external environment. May fail randomly.
-        Returns a feedback dictionary or None.
+        Sense the environment. Two modes:
+
+        1. With domain_data: Uses the sensor bridge to encode raw physical
+           measurements (magnetic, light, sound, gravity, electric) into a
+           convergence vector and derives environmental feedback from the
+           geometric analysis. This is real sensing.
+
+        2. Without domain_data: Falls back to simulated random feedback
+           for testing and offline operation.
+
+        Args:
+            domain_data: Optional dict mapping domain names to geometry dicts.
+                         e.g. {"magnetic": {"field_lines": [...], ...}, ...}
+
+        Returns:
+            dict with ambient_entropy, peer_cooperation_index,
+            resource_signal_strength, external_noise_level — or None on failure.
         """
+        if domain_data is not None:
+            try:
+                return sense_domains(domain_data)
+            except Exception:
+                return None
+
+        # Fallback: simulated sensing (original behavior)
         try:
-            # Simulate incoming feedback data with a chance of failure
             if random.random() < 0.1:
                 raise ConnectionError("Sensing error or null environment")
             feedback = {
