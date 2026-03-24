@@ -1,14 +1,25 @@
 import uuid
 import random
+import sys
+import os
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "protocols"))
+
+from rosetta_bridge import resonance as shape_resonance
+
 
 class MultiAgentCoordinator:
     """
     Manages registration, group resonance evaluation, and merge proposals
     for symbolic agents in a shared intelligence system.
 
-    Resonance is computed from real signals — trait overlap between agents
-    and essence alignment — rather than random assignment. Two agents that
-    share traits and purpose will naturally resonate; mismatched agents won't.
+    Resonance is computed from real signals — trait overlap between agents,
+    essence alignment, and (when available) Rosetta shape identity. Two agents
+    that share traits and geometric identity will naturally resonate; mismatched
+    agents won't.
+
+    When agents carry a shape_id (from the Rosetta ontology), shape resonance
+    is blended into the score using Jaccard similarity over trait families.
     """
 
     # Known traits used across the system. Shared here so resonance can
@@ -25,10 +36,13 @@ class MultiAgentCoordinator:
 
         Resonance = weighted combination of:
           - Trait overlap:  fraction of this agent's traits shared by at least
-                            one other agent (0.0–1.0). Weight: 0.5
+                            one other agent (0.0–1.0). Weight: 0.35
           - Essence match:  fraction of other agents that share essence (0.0–1.0).
-                            Weight: 0.3
-          - Energy signal:  normalized energy from state (0.0–1.0). Weight: 0.2
+                            Weight: 0.2
+          - Energy signal:  normalized energy from state (0.0–1.0). Weight: 0.15
+          - Shape resonance: avg Jaccard similarity of shape_id against peers
+                            (0.0–1.0). Weight: 0.3 (only when shape_ids present,
+                            otherwise weight redistributed to traits + essence).
 
         If only one agent is registered, resonance is based on energy alone
         with a 0.5 baseline (no peers to resonate with, not penalized).
@@ -38,6 +52,7 @@ class MultiAgentCoordinator:
 
         target_traits = set(target["state"].get("traits", []))
         target_essence = target["essence"]
+        target_shape = target["state"].get("shape_id")
         energy_ratio = min(target["state"].get("energy", 100.0), 100.0) / 100.0
 
         if not others:
@@ -59,10 +74,28 @@ class MultiAgentCoordinator:
         )
         essence_score = essence_matches / len(others)
 
-        resonance = round(
-            0.5 * trait_score + 0.3 * essence_score + 0.2 * energy_ratio, 2
-        )
-        return resonance
+        # Shape resonance: Jaccard similarity via Rosetta bridge
+        shape_score = None
+        if target_shape:
+            peer_shape_scores = []
+            for peer in others.values():
+                peer_shape = peer["state"].get("shape_id")
+                if peer_shape:
+                    peer_shape_scores.append(shape_resonance(target_shape, peer_shape))
+            if peer_shape_scores:
+                shape_score = sum(peer_shape_scores) / len(peer_shape_scores)
+
+        # Blend weights — shape gets 0.3 when available, otherwise redistributed
+        if shape_score is not None:
+            resonance_val = round(
+                0.35 * trait_score + 0.2 * essence_score +
+                0.15 * energy_ratio + 0.3 * shape_score, 2
+            )
+        else:
+            resonance_val = round(
+                0.5 * trait_score + 0.3 * essence_score + 0.2 * energy_ratio, 2
+            )
+        return resonance_val
 
     def register_agent(self, agent_id, essence, current_state):
         """
