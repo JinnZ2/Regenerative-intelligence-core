@@ -25,6 +25,13 @@
         "ref": "main",
         "paths": ["sensors/**/*.json", "definitions/**/*.json"],
         "purpose": "Extended symbolic sensor definitions and calibration data"
+      },
+      {
+        "name": "rosetta-shape-core",
+        "repo": "https://github.com/JinnZ2/Rosetta-shape-core",
+        "ref": "main",
+        "paths": ["shapes/**/*.json", "mappings/**/*.json"],
+        "purpose": "Geometric shape definitions and symbolic geometry translation for seed classification"
       }
     ],
     "exports": [
