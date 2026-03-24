@@ -30,8 +30,13 @@
         "name": "rosetta-shape-core",
         "repo": "https://github.com/JinnZ2/Rosetta-shape-core",
         "ref": "main",
-        "paths": ["shapes/**/*.json", "mappings/**/*.json"],
-        "purpose": "Geometric shape definitions and symbolic geometry translation for seed classification"
+        "paths": [
+          "shapes/**/*.json",
+          "bridges/rosetta-bridges.json",
+          "ontology/**/*.json",
+          "schema/shape.seed.schema.json"
+        ],
+        "purpose": "Ecosystem navigation hub and symbolic ontology — bridges shapes to sensors, emotions, defenses, and protocols. Provides shape.seed.schema for seed geometry grounding."
       }
     ],
     "exports": [

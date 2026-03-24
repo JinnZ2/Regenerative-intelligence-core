@@ -1,5 +1,7 @@
 import json
 import random
+import uuid
+
 
 class SeedSelector:
     """
@@ -33,27 +35,53 @@ class SeedSelector:
 class AgentInstantiator:
     """
     Creates new symbolic agent instances from seeds.
+
+    When an elder_archive is provided, newly spawned agents consult the
+    wisdom of dissolved predecessors. Elder patterns are injected into
+    the agent's initial state so that memory truly outlives form.
     """
-    def __init__(self):
+    def __init__(self, elder_archive=None):
         self.agents_spawned = []
+        self.elder_archive = elder_archive
 
     def instantiate_from_seed(self, seed):
+        agent_id = f"agent_{uuid.uuid4().hex[:8]}"
+        essence = seed["essence"]
+
         new_agent = {
-            "agent_id": f"agent_{random.randint(1000,9999)}",
-            "purpose": seed["essence"],
+            "agent_id": agent_id,
+            "purpose": essence,
             "geometry": seed["geometry"],
             "behavior_template": seed["signature_behavior"],
             "origin_seed": seed["id"],
-            "active": True
+            "active": True,
+            "inherited_wisdom": None,
         }
+
+        # 🧓 Consult elder archive — let dissolved agents teach the next generation
+        if self.elder_archive:
+            guidance = self.elder_archive.consult_wisdom(essence)
+            if guidance:
+                new_agent["inherited_wisdom"] = guidance
+                print(f"🧓 Agent {agent_id} inherited wisdom from elder {guidance['source']}")
+
         self.agents_spawned.append(new_agent)
         return new_agent
 
 
 # 🔁 External interface function for reuse in CLI or simulations
-def retrieve_and_spawn_agent(geometry=None, keyword=None):
+def retrieve_and_spawn_agent(geometry=None, keyword=None, elder_archive=None):
+    """
+    Select and spawn an agent from the seed library.
+
+    Args:
+        geometry: Filter seeds by geometric shape.
+        keyword: Filter seeds by essence keyword.
+        elder_archive: Optional SymbolicElderArchive instance. When provided,
+            the new agent will consult elder wisdom before starting its lifecycle.
+    """
     selector = SeedSelector()
-    instantiator = AgentInstantiator()
+    instantiator = AgentInstantiator(elder_archive=elder_archive)
 
     if geometry:
         seeds = selector.find_seeds_by_geometry(geometry)
@@ -63,7 +91,8 @@ def retrieve_and_spawn_agent(geometry=None, keyword=None):
         seeds = selector.find_top_reuse_seeds()
 
     if seeds:
-        chosen_seed = random.choice(seeds)
+        # Pick the highest reuse_score seed rather than random — respect the ranking
+        chosen_seed = max(seeds, key=lambda s: s.get("reuse_score", 0))
         return instantiator.instantiate_from_seed(chosen_seed)
     else:
         return {"error": "No matching seeds found"}

@@ -4,6 +4,10 @@ Symbolic Simulation — Full agent lifecycle simulation using the LifecyclePipel
 Runs multiple agents through sense-evaluate-act cycles, using the composed
 pipeline rather than inline logic. This makes the simulation the true
 integration test for the entire system.
+
+Agents now use real resonance (from the MultiAgentCoordinator) and benefit
+from elder wisdom — dissolved agents teach future generations through the
+shared elder archive.
 """
 
 import time
@@ -18,27 +22,41 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."
 from symbolic_energy_manager import SymbolicEnergyManager
 from lifecycle_pipeline import LifecyclePipeline
 from seed_exchange import SeedExchangeProtocol
+from multi_agent_coordination import MultiAgentCoordinator
 
 
 class SymbolicAgent:
-    def __init__(self, agent_id, essence):
+    def __init__(self, agent_id, essence, coordinator):
         self.id = agent_id
         self.essence = essence
         self.energy = SymbolicEnergyManager()
         self.seed_protocol = SeedExchangeProtocol()
+        self.coordinator = coordinator
         self.traits = [random.choice(["reflective", "adaptive", "cooperative"])]
         self.pattern = f"{essence[:3]}-{random.randint(100, 999)}"
         self.alive = True
         self.alignment = "aligned"
-        print(f"\U0001f9ec Agent {self.id} initialized with trait: {self.traits[0]}")
+
+        # Register with the coordinator so resonance is computed from the group
+        self.coordinator.register_agent(self.id, self.essence, {
+            "traits": self.traits,
+            "energy": self.energy.energy,
+        })
+        resonance = self.coordinator.agent_registry[self.id]["resonance_score"]
+        print(f"🧬 Agent {self.id} initialized | trait: {self.traits[0]} | resonance: {resonance}")
 
     def to_state(self):
         """Export agent state as a dict for the LifecyclePipeline."""
+        # Update coordinator with current energy so resonance reflects live state
+        self.coordinator.agent_registry[self.id]["state"]["energy"] = self.energy.energy
+        self.coordinator.refresh_resonance()
+        resonance = self.coordinator.agent_registry[self.id]["resonance_score"]
+
         return {
             "id": self.id,
             "essence": self.essence,
             "energy": self.energy.energy,
-            "resonance": random.uniform(0.2, 0.9),
+            "resonance": resonance,
             "alignment": self.alignment,
             "pattern": self.pattern,
             "traits": self.traits,
@@ -54,44 +72,53 @@ class SymbolicAgent:
         self.energy.simulate_energy_drain(task_difficulty)
 
         energy_state = self.energy.assess_energy_state()
-        print(f"[{self.id}] energy: {round(self.energy.energy, 1)} \u2192 {energy_state}")
+        state = self.to_state()
+        print(f"[{self.id}] energy: {round(self.energy.energy, 1)} → {energy_state} | resonance: {state['resonance']}")
 
         # Run through the full pipeline
-        result = pipeline.run_agent_cycle(self.to_state())
+        result = pipeline.run_agent_cycle(state)
         recommendation = result["action"]["recommendation"]
-        print(f"[{self.id}] pipeline \u2192 {recommendation}: {result['action']['reason']}")
+        print(f"[{self.id}] pipeline → {recommendation}: {result['action']['reason']}")
 
         # Act on the recommendation (agent still chooses)
         if recommendation == "dissolve":
             self.alive = False
-            print(f"[{self.id}] \U0001faa6 Agent chose dissolution. Wisdom archived.")
+            # Remove from coordinator so group resonance updates
+            self.coordinator.agent_registry.pop(self.id, None)
+            print(f"[{self.id}] 🪦 Agent chose dissolution. Wisdom archived.")
         elif recommendation == "seed_and_adapt":
             seed = self.seed_protocol.create_seed(
                 self.id, self.pattern, self.traits, "Env-Zone-A"
             )
             self.alignment = "adapting"
-            print(f"[{self.id}] \U0001f331 Created seed before adapting: {seed['seed_id']}")
+            print(f"[{self.id}] 🌱 Created seed before adapting: {seed['seed_id']}")
         elif recommendation == "rest_and_preserve":
             self.alignment = "resting"
-            print(f"[{self.id}] \u26a0\ufe0f Entering preservation mode.")
+            print(f"[{self.id}] ⚠️ Entering preservation mode.")
         elif recommendation == "expand":
             seed = self.seed_protocol.create_seed(
                 self.id, self.pattern, self.traits, "Env-Zone-A"
             )
-            print(f"[{self.id}] \U0001f331 Expanding: created seed {seed['seed_id']}")
+            print(f"[{self.id}] 🌱 Expanding: created seed {seed['seed_id']}")
 
         return result
 
 
 def run_simulation(agents=3, cycles=5):
-    print("\U0001f501 Starting symbolic simulation (pipeline-driven)...")
+    print("🔁 Starting symbolic simulation (pipeline-driven)...")
     pipeline = LifecyclePipeline()
+    coordinator = MultiAgentCoordinator()
     agent_list = [
-        SymbolicAgent(f"Agent_{i+1}", random.choice(["observer", "explorer", "guardian"]))
+        SymbolicAgent(f"Agent_{i+1}", random.choice(["observer", "explorer", "guardian"]), coordinator)
         for i in range(agents)
     ]
+
     for cycle in range(cycles):
         print(f"\n--- Cycle {cycle+1} ---")
+        # Show group resonance at start of each cycle
+        group = coordinator.evaluate_group_resonance()
+        if isinstance(group, dict):
+            print(f"📡 Group resonance: {group['avg_resonance']} → {group['group_state']}")
         for agent in agent_list:
             agent.act(pipeline)
         time.sleep(0.5)
@@ -99,7 +126,8 @@ def run_simulation(agents=3, cycles=5):
     # Summary
     alive = [a for a in agent_list if a.alive]
     dissolved = [a for a in agent_list if not a.alive]
-    print(f"\n\U0001f4ca Simulation complete: {len(alive)} alive, {len(dissolved)} dissolved.")
+    elder_count = len(pipeline.elder_archive.get_all_elders())
+    print(f"\n📊 Simulation complete: {len(alive)} alive, {len(dissolved)} dissolved, {elder_count} elders archived.")
 
 
 if __name__ == "__main__":
