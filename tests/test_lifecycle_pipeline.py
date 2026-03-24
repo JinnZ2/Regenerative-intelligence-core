@@ -77,7 +77,7 @@ class TestLifecyclePipeline(unittest.TestCase):
             "traits": ["reflective"],
         }
         result = self.pipeline.run_agent_cycle(state)
-        expected_steps = {"environment", "alignment", "conflict", "compassion"}
+        expected_steps = {"environment", "alignment", "conflict", "compassion", "elder_consultation"}
         self.assertEqual(set(result["steps"].keys()), expected_steps)
 
     def test_deterministic_reproducibility(self):

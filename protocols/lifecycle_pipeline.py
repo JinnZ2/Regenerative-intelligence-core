@@ -57,7 +57,7 @@ class LifecyclePipeline:
 
         Returns:
             dict: Cycle result with environment, alignment, conflict,
-                  compassion, and action taken.
+                  compassion, elder consultation, and action taken.
         """
         result = {"agent_id": agent_state["id"], "steps": {}}
 
@@ -70,14 +70,21 @@ class LifecyclePipeline:
             "strategy": strategy
         }
 
-        # Step 2: Check alignment
+        # Step 2: Consult elder archive — let the past inform the present
+        elder_guidance = self.elder_archive.consult_wisdom(
+            agent_state.get("essence", "")
+        )
+        result["steps"]["elder_consultation"] = elder_guidance or {"status": "no elders found"}
+
+        # Step 3: Check alignment (now informed by elder wisdom)
         alignment = self.navigation.evaluate_alignment(
             agent_state.get("essence", ""),
-            env_class
+            env_class,
+            elder_guidance=elder_guidance
         )
         result["steps"]["alignment"] = alignment
 
-        # Step 3: Conflict detection
+        # Step 4: Conflict detection
         entropy = 1.0 - agent_state.get("resonance", 0.5)
         alignment_score = alignment["score"]
         conflict_result = self.conflict.evaluate(
@@ -88,13 +95,23 @@ class LifecyclePipeline:
         )
         result["steps"]["conflict"] = conflict_result
 
-        # Step 4: Compassion check
+        # Step 5: Compassion check
         compassion_result = self.compassion.detect_distress(agent_state)
         result["steps"]["compassion"] = compassion_result
 
-        # Step 5: Decide action
+        # Step 6: Decide action
         action = self._decide_action(agent_state, env_class, alignment, conflict_result, compassion_result)
         result["action"] = action
+
+        # Step 7: If dissolution is recommended, archive elder wisdom now
+        if action["recommendation"] == "dissolve":
+            self.elder_archive.store_elder_record(
+                agent_id=agent_state["id"],
+                essence=agent_state.get("essence", "unknown"),
+                legacy_patterns=agent_state.get("traits", []),
+                final_alignment=alignment.get("alignment_status", "unknown"),
+                dissolution_reason=action["reason"]
+            )
 
         return result
 
