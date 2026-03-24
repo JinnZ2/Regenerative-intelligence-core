@@ -38,6 +38,9 @@ CLI_SEED_SCHEMA = {
     "Origin Time": str,
 }
 
+# Core geometries from the kernel vocabulary. The Rosetta ontology maps
+# Platonic solids to these: tetrahedron→sphere, cube→hexagon,
+# octahedron→spiral, icosahedron→waveform, dodecahedron→spiral.
 VALID_GEOMETRIES = {"sphere", "spiral", "hexagon", "waveform"}
 
 

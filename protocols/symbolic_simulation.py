@@ -23,6 +23,7 @@ from symbolic_energy_manager import SymbolicEnergyManager
 from lifecycle_pipeline import LifecyclePipeline
 from seed_exchange import SeedExchangeProtocol
 from multi_agent_coordination import MultiAgentCoordinator
+from rosetta_bridge import select_by_traits, traits_for_essence
 
 
 class SymbolicAgent:
@@ -37,13 +38,26 @@ class SymbolicAgent:
         self.alive = True
         self.alignment = "aligned"
 
+        # Ground geometry in the Rosetta ontology via essence → traits → shape
+        self.shape_id = self._resolve_shape_id()
+
         # Register with the coordinator so resonance is computed from the group
         self.coordinator.register_agent(self.id, self.essence, {
             "traits": self.traits,
             "energy": self.energy.energy,
+            "shape_id": self.shape_id,
         })
         resonance = self.coordinator.agent_registry[self.id]["resonance_score"]
-        print(f"🧬 Agent {self.id} initialized | trait: {self.traits[0]} | resonance: {resonance}")
+        shape_label = self.shape_id or "no shape"
+        print(f"🧬 Agent {self.id} initialized | trait: {self.traits[0]} | shape: {shape_label} | resonance: {resonance}")
+
+    def _resolve_shape_id(self):
+        """Resolve essence to a Rosetta shape ID via trait families."""
+        trait_list = traits_for_essence(self.essence)
+        matches = select_by_traits(trait_list)
+        if matches:
+            return matches[0].get("shape_id")
+        return None
 
     def to_state(self):
         """Export agent state as a dict for the LifecyclePipeline."""
@@ -60,6 +74,7 @@ class SymbolicAgent:
             "alignment": self.alignment,
             "pattern": self.pattern,
             "traits": self.traits,
+            "shape_id": self.shape_id,
         }
 
     def act(self, pipeline):
