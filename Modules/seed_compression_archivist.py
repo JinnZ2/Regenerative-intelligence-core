@@ -50,7 +50,19 @@ class SeedArchivist:
         with open(self.seed_file, "w") as f:
             json.dump(self.library, f, indent=4)
 
-    def deposit_seed(self, agent_id, essence, reuse_score=0.9):
+    def deposit_seed(self, agent_id, essence, reuse_score=0.9,
+                     shape_id=None, amplitude_vector=None, binary_encoding=None):
+        """
+        Archive a compressed seed to the library.
+
+        Optional enrichment fields bridge the seed to external ontologies:
+          shape_id         — Rosetta SHAPE.X identifier
+          amplitude_vector — 6 octahedral amplitudes from G2B bridge
+          binary_encoding  — 5-int quantized form (40-bit compressed)
+
+        These are stored when provided so the seed carries its full
+        geometric identity across generations.
+        """
         seed = {
             "id": str(uuid.uuid4()),
             "agent_id": agent_id,
@@ -60,6 +72,13 @@ class SeedArchivist:
             "signature_behavior": essence["signature_behavior"],
             "reuse_score": reuse_score
         }
+        # Carry optional enrichment fields when present
+        if shape_id is not None:
+            seed["shape_id"] = shape_id
+        if amplitude_vector is not None:
+            seed["amplitude_vector"] = amplitude_vector
+        if binary_encoding is not None:
+            seed["binary_encoding"] = binary_encoding
         self.library.append(seed)
         self.save_library()
         return seed
