@@ -91,13 +91,82 @@ def validate_seed(seed, schema=None):
     return {"valid": len(errors) == 0, "errors": errors}
 
 
+def normalize_seed(seed):
+    """
+    Convert any seed variant (exchange, archived, CLI) to a canonical format.
+
+    The canonical format uses the archived seed keys (lowercase, concise)
+    as the standard internal representation. This allows all subsystems to
+    work with a single format while accepting seeds in any variant.
+
+    Returns:
+        dict: Seed in canonical (archived) format, or None if unrecognizable.
+    """
+    if not isinstance(seed, dict):
+        return None
+
+    variant = _detect_variant(seed)
+
+    if variant == "archived":
+        return dict(seed)
+
+    if variant == "exchange":
+        return {
+            "id": seed.get("seed_id", ""),
+            "agent_id": seed.get("agent_id", ""),
+            "essence": seed.get("symbolic_pattern", ""),
+            "geometry": "waveform",  # exchange seeds don't carry geometry
+            "origin_time": seed.get("timestamp", ""),
+            "signature_behavior": ", ".join(seed.get("traits", [])),
+            "reuse_score": seed.get("viability_score", 0.0),
+        }
+
+    if variant == "cli":
+        return {
+            "id": seed.get("ID", ""),
+            "agent_id": seed.get("Agent", ""),
+            "essence": seed.get("Purpose", ""),
+            "geometry": seed.get("Geometry", "waveform").lower(),
+            "origin_time": seed.get("Origin Time", ""),
+            "signature_behavior": seed.get("Behavior Summary", ""),
+            "reuse_score": seed.get("Reuse Score", 0.0),
+        }
+
+    return None
+
+
+def to_cli_format(seed):
+    """Convert a canonical (archived) seed to CLI display format."""
+    normalized = normalize_seed(seed) if _detect_variant(seed) != "archived" else seed
+    if not normalized:
+        return None
+    return {
+        "ID": normalized["id"],
+        "Agent": normalized["agent_id"],
+        "Behavior Summary": normalized["signature_behavior"],
+        "Purpose": normalized["essence"],
+        "Geometry": normalized["geometry"],
+        "Reuse Score": normalized["reuse_score"],
+        "Origin Time": normalized["origin_time"],
+    }
+
+
+def _detect_variant(seed):
+    """Identify which schema variant a seed follows."""
+    if "seed_id" in seed:
+        return "exchange"
+    elif "ID" in seed:
+        return "cli"
+    elif "id" in seed and "essence" in seed:
+        return "archived"
+    return "unknown"
+
+
 def _detect_schema(seed):
     """Auto-detect which schema variant a seed follows."""
-    if "seed_id" in seed:
-        return SEED_SCHEMA
-    elif "ID" in seed:
-        return CLI_SEED_SCHEMA
-    elif "id" in seed and "essence" in seed:
-        return ARCHIVED_SEED_SCHEMA
-    else:
-        return SEED_SCHEMA
+    variant = _detect_variant(seed)
+    return {
+        "exchange": SEED_SCHEMA,
+        "cli": CLI_SEED_SCHEMA,
+        "archived": ARCHIVED_SEED_SCHEMA,
+    }.get(variant, SEED_SCHEMA)
