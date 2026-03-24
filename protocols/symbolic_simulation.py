@@ -23,7 +23,8 @@ from symbolic_energy_manager import SymbolicEnergyManager
 from lifecycle_pipeline import LifecyclePipeline
 from seed_exchange import SeedExchangeProtocol
 from multi_agent_coordination import MultiAgentCoordinator
-from rosetta_bridge import select_by_essence
+from rosetta_bridge import select_by_essence, geometry_for_shape
+from seed_compression_archivist import SeedArchivist, PatternCompressor
 
 
 class SymbolicAgent:
@@ -110,6 +111,23 @@ class SymbolicAgent:
             dominant = self.energy.get_dominant_channel() or "uniform"
             print(f"[{self.id}] 🔷 final shape: {[round(p, 3) for p in proportions]} → {dominant}")
             print(f"[{self.id}] 🔷 binary seed: {binary} (40 bits)")
+
+            # Persist the seed with its full geometric identity to disk
+            compressor = PatternCompressor()
+            essence = compressor.compress_pattern(
+                [], f"{dominant} pattern from lifecycle",
+                self.essence
+            )
+            archivist = SeedArchivist()
+            archivist.deposit_seed(
+                self.id, essence,
+                reuse_score=round(max(proportions), 2),
+                shape_id=self.shape_id,
+                amplitude_vector=[round(p, 6) for p in proportions],
+                binary_encoding=binary,
+            )
+            print(f"[{self.id}] 💾 Seed persisted to library with amplitude vector.")
+
             # Remove from coordinator so group resonance updates
             self.coordinator.agent_registry.pop(self.id, None)
             print(f"[{self.id}] 🪦 Agent chose dissolution. Wisdom and shape archived.")

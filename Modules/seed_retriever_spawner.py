@@ -97,6 +97,14 @@ class AgentInstantiator:
         self.elder_archive = elder_archive
 
     def instantiate_from_seed(self, seed):
+        """
+        Create a new agent from a seed.
+
+        When the seed carries an amplitude_vector, the new agent inherits
+        its parent's emergent geometric identity as a starting point.
+        The agent will accumulate its own impulses on top of this foundation —
+        inherited shape is a beginning, not a destiny.
+        """
         agent_id = f"agent_{uuid.uuid4().hex[:8]}"
         essence = seed["essence"]
 
@@ -109,7 +117,14 @@ class AgentInstantiator:
             "origin_seed": seed["id"],
             "active": True,
             "inherited_wisdom": None,
+            "inherited_amplitude": None,
         }
+
+        # 🔷 Inherit parent's emergent geometric identity when available
+        parent_amplitude = seed.get("amplitude_vector")
+        if parent_amplitude and isinstance(parent_amplitude, list) and len(parent_amplitude) == 6:
+            new_agent["inherited_amplitude"] = parent_amplitude
+            print(f"🔷 Agent {agent_id} inherited shape from parent seed")
 
         # 🧓 Consult elder archive — let dissolved agents teach the next generation
         if self.elder_archive:

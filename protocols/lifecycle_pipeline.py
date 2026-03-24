@@ -37,13 +37,13 @@ class LifecyclePipeline:
     distressed, and decides whether to continue, seed, or dissolve.
     """
 
-    def __init__(self):
+    def __init__(self, elder_archive_file="elder_archive.json"):
         self.environment = EnvironmentalFeedbackLayer()
         self.navigation = NavigationProtocol()
         self.compassion = CompassionReflexLayer()
         self.seed_protocol = SeedExchangeProtocol()
         self.exit_protocol = GracefulExitProtocol()
-        self.elder_archive = SymbolicElderArchive()
+        self.elder_archive = SymbolicElderArchive(archive_file=elder_archive_file)
         self.evolution = EvolutionLoopTracker()
         self.conflict = PatternConflictProtocol()
 
