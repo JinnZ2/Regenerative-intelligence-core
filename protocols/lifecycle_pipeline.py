@@ -103,7 +103,16 @@ class LifecyclePipeline:
         action = self._decide_action(agent_state, env_class, alignment, conflict_result, compassion_result)
         result["action"] = action
 
-        # Step 7: If dissolution is recommended, archive elder wisdom now
+        # Step 7: Compute amplitude impulses for this cycle
+        # These are directional nudges the agent can accumulate into its
+        # emergent geometric identity. The pipeline recommends; the agent decides.
+        impulses = self._compute_amplitude_impulses(
+            agent_state, env_class, alignment, conflict_result,
+            compassion_result, action
+        )
+        result["amplitude_impulses"] = impulses
+
+        # Step 8: If dissolution is recommended, archive elder wisdom now
         if action["recommendation"] == "dissolve":
             self.elder_archive.store_elder_record(
                 agent_id=agent_state["id"],
@@ -114,6 +123,61 @@ class LifecyclePipeline:
             )
 
         return result
+
+    def _compute_amplitude_impulses(self, agent_state, env_class, alignment,
+                                       conflict_result, compassion_result, action):
+        """
+        Map pipeline signals to octahedral amplitude impulses.
+
+        Each lifecycle event produces directional nudges that the agent
+        accumulates into its emergent geometric identity. The magnitude
+        scales with signal strength so strong signals shape the agent
+        more than weak ones.
+
+        Channel mapping:
+            structure (+X)     — alignment holds, expansion, building
+            flow (-X)          — misalignment, adaptation, conflict response
+            connection (+Y)    — compassion, empathy, resonance
+            autonomy (-Y)      — self-preservation, rest, independent action
+            transcendence (+Z) — elder wisdom, seeding, dissolution wisdom
+            grounding (-Z)     — environment sensing, data awareness
+        """
+        impulses = {}
+
+        # Every cycle senses environment → grounding
+        impulses["grounding"] = 0.1
+
+        # Elder wisdom → transcendence
+        elder = self.elder_archive.consult_wisdom(agent_state.get("essence", ""))
+        if elder and elder.get("wisdom"):
+            impulses["transcendence"] = 0.15
+
+        # Alignment signal
+        score = alignment.get("score", 0.5)
+        if alignment.get("alignment_status") == "aligned":
+            impulses["structure"] = score * 0.2
+        else:
+            impulses["flow"] = (1.0 - score) * 0.2
+
+        # Compassion signal → connection
+        if compassion_result.get("status") == "distress noticed":
+            impulses["connection"] = 0.15
+
+        # Action-specific impulses
+        rec = action.get("recommendation", "continue")
+        if rec == "expand":
+            impulses["structure"] = impulses.get("structure", 0) + 0.1
+            impulses["connection"] = impulses.get("connection", 0) + 0.1
+        elif rec == "seed_and_adapt":
+            impulses["flow"] = impulses.get("flow", 0) + 0.15
+            impulses["transcendence"] = impulses.get("transcendence", 0) + 0.1
+        elif rec == "rest_and_preserve":
+            impulses["autonomy"] = 0.15
+            impulses["grounding"] = impulses.get("grounding", 0) + 0.1
+        elif rec == "dissolve":
+            impulses["transcendence"] = impulses.get("transcendence", 0) + 0.2
+
+        return impulses
 
     def _decide_action(self, agent_state, env_class, alignment, conflict_result, compassion_result):
         """

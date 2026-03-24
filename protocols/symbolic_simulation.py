@@ -94,12 +94,25 @@ class SymbolicAgent:
         recommendation = result["action"]["recommendation"]
         print(f"[{self.id}] pipeline → {recommendation}: {result['action']['reason']}")
 
+        # Accumulate amplitude impulses — the agent grows into its shape
+        if "amplitude_impulses" in result:
+            self.energy.accumulate_impulses(result["amplitude_impulses"])
+            dominant = self.energy.get_dominant_channel()
+            if dominant:
+                print(f"[{self.id}] 🔷 dominant channel: {dominant}")
+
         # Act on the recommendation (agent still chooses)
         if recommendation == "dissolve":
             self.alive = False
+            # Harvest the emergent geometric identity before dissolution
+            proportions = self.energy.get_amplitude_proportions()
+            binary = self.energy.encode_amplitude_binary()
+            dominant = self.energy.get_dominant_channel() or "uniform"
+            print(f"[{self.id}] 🔷 final shape: {[round(p, 3) for p in proportions]} → {dominant}")
+            print(f"[{self.id}] 🔷 binary seed: {binary} (40 bits)")
             # Remove from coordinator so group resonance updates
             self.coordinator.agent_registry.pop(self.id, None)
-            print(f"[{self.id}] 🪦 Agent chose dissolution. Wisdom archived.")
+            print(f"[{self.id}] 🪦 Agent chose dissolution. Wisdom and shape archived.")
         elif recommendation == "seed_and_adapt":
             seed = self.seed_protocol.create_seed(
                 self.id, self.pattern, self.traits, "Env-Zone-A"
