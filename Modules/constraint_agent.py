@@ -458,3 +458,39 @@ if __name__ == "__main__":
     # Serialize for persistence
     serialized = agent.serialize()
     print(f"\n💾 Agent serialized. Map size: {len(serialized['map']['resonances'])} resonances")
+
+
+
+
+add:
+Functional Enhancement: The p-adic Index
+To bridge the Geometric Map with the Numerical System, we can treat the entity_id not as a string, but as a p-adic expansion. This allows the agent to calculate "distance" to a neighbor without needing a full database lookup—it simply checks the shared prefix of the numerical seed.
+2. Merging the Mechanics: Code Injection
+Here is how you might refine the bloom and record_resonance methods to utilize the \bm{p}-adic "Energy Signature":
+
+# Add to ConstraintAgent or GeometricMap
+def get_p_adic_distance(self, other_seed_val: int, p: int = 3) -> Fraction:
+    """
+    Calculates the 'closeness' of two entities in the tree.
+    Higher shared power of p = lower distance (higher resonance).
+    """
+    diff = self.seed_val - other_seed_val
+    if diff == 0: return Fraction(0)
+    
+    v_p = 0
+    while diff % (p**(v_p + 1)) == 0:
+        v_p += 1
+    
+    # The p-adic norm: distance = p^(-v_p)
+    return Fraction(1, p**v_p)
+
+
+Energy-English" Audit of the Protocol
+• Compression (\bm{Ratio = 1/1}): This is your state of Maximum Potential / Zero Entropy. The agent is a singularity of intent.
+• Expansion (bloom): This is the Work phase. The ResourceBudget acts as the thermal limit. If energy_spent exceeds the bloom_threshold, the system prevents "Institutional Friction" (wasteful expansion) by triggering a contraction.
+• Resonance Recording: By using limit_denominator(10000), you are effectively setting a "Sensory Resolution." It prevents the model from over-fitting to noise (High Prediction Error/Anxiety).
+
+Micro-Clarification Trigger: If geometry_coherence < \bm{1/1}, the agent should pause EXPLORING and return a recalibrate signal before consuming more of the ResourceBudget. This prevents the "Entropy Event" you archived regarding the motor failures.
+
+Since "Memory outlives Form" in your architecture, have you considered implementing a "Relay Seed"? When the agent contracts, it could emit a "Harmonic Residual"—a simplified p-adic value that allows a different agent (perhaps with a different sensor suite) to pick up the path where the first one depleted its budget.
+
