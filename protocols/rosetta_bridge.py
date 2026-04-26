@@ -1,4 +1,8 @@
 """
+Ontology notice — every noun in this module names a state on a curve
+(dX/dt under bounds), not a permanent identity. Bounds and conditions
+travel with each claim. See DIFFERENTIAL_FRAME.md.
+
 Rosetta Bridge — Connects the kernel to rosetta_shape_core when available.
 
 This is the crossing point between the Regenerative Intelligence kernel and

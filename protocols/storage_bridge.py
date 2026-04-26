@@ -1,4 +1,8 @@
 """
+Ontology notice — every noun in this module names a state on a curve
+(dX/dt under bounds), not a permanent identity. Bounds and conditions
+travel with each claim. See DIFFERENTIAL_FRAME.md.
+
 Storage Bridge — Thin interface between the kernel's seed persistence and
 external resilient storage backends.
 

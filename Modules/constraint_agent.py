@@ -1,4 +1,8 @@
 """
+Ontology notice — every noun in this module names a state on a curve
+(dX/dt under bounds), not a permanent identity. Bounds and conditions
+travel with each claim. See DIFFERENTIAL_FRAME.md.
+
 Constraint Agent — An agent that expands from a geometric seed into constraint space.
 
 Symbolic purpose:

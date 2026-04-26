@@ -1,4 +1,8 @@
 """
+Ontology notice — every noun in this module names a state on a curve
+(dX/dt under bounds), not a permanent identity. Bounds and conditions
+travel with each claim. See DIFFERENTIAL_FRAME.md.
+
 Symbolic Intelligence CLI — Interactive interface for seed management.
 
 This CLI provides a human-facing interface to the seed lifecycle:

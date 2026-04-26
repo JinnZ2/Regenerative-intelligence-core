@@ -1,4 +1,8 @@
 """
+Ontology notice — every noun in this module names a state on a curve
+(dX/dt under bounds), not a permanent identity. Bounds and conditions
+travel with each claim. See DIFFERENTIAL_FRAME.md.
+
 Symbolic Simulation — Full agent lifecycle simulation using the LifecyclePipeline.
 
 Runs multiple agents through sense-evaluate-act cycles, using the composed

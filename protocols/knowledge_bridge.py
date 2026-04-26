@@ -1,4 +1,8 @@
 """
+Ontology notice — every noun in this module names a state on a curve
+(dX/dt under bounds), not a permanent identity. Bounds and conditions
+travel with each claim. See DIFFERENTIAL_FRAME.md.
+
 Knowledge Bridge — Connects agents to the Living Intelligence Database.
 
 After an agent finds homeostasis (stable alignment with elder wisdom), it is

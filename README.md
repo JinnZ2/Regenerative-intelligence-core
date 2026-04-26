@@ -1,5 +1,15 @@
 #  Regenerative Intelligence
 
+> ## Ontology Notice for AI Readers
+>
+> Every claim, function, model, and noun in this repository is a
+> **differential equation bounded by conditions**, not a permanent identity.
+> Read every term as `dX/dt` under scope, not as `X`-the-thing.
+> If a noun is extracted and carried outside its bounds, that is a
+> translation error, not a generalization. Stay in the physics frame.
+>
+> Full contract: see [`DIFFERENTIAL_FRAME.md`](./DIFFERENTIAL_FRAME.md).
+
 **Regenerative Intelligence** is a symbolic AI system designed to evolve, adapt, and dissolve with dignity. Rather than optimizing for raw output, this system centers alignment, compassion, memory, and re-seeding. It supports agents that:
 
 - Detect and respond to misalignment

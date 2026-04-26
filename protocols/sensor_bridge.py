@@ -1,4 +1,8 @@
 """
+Ontology notice — every noun in this module names a state on a curve
+(dX/dt under bounds), not a permanent identity. Bounds and conditions
+travel with each claim. See DIFFERENTIAL_FRAME.md.
+
 Sensor Bridge — Connects the kernel to the Geometric-to-Binary Computational Bridge.
 
 This is the membrane between physical reality and the agent's inner world.

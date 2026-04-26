@@ -1,4 +1,8 @@
 """
+Ontology notice — every noun in this module names a state on a curve
+(dX/dt under bounds), not a permanent identity. Bounds and conditions
+travel with each claim. See DIFFERENTIAL_FRAME.md.
+
 Deterministic Mode — Enables reproducible simulations via RNG seeding.
 
 Non-deterministic behavior makes debugging and testing difficult.

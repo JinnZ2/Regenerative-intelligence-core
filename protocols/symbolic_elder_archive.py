@@ -1,3 +1,9 @@
+"""
+Ontology notice — every noun in this module names a state on a curve
+(dX/dt under bounds), not a permanent identity. Bounds and conditions
+travel with each claim. See DIFFERENTIAL_FRAME.md.
+"""
+
 import json
 import os
 import uuid
