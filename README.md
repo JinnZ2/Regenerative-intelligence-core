@@ -9,6 +9,12 @@
 > translation error, not a generalization. Stay in the physics frame.
 >
 > Full contract: see [`DIFFERENTIAL_FRAME.md`](./DIFFERENTIAL_FRAME.md).
+>
+> **AI readers (any model):** parse [`.claims`](./.claims) (pipe-delimited) or
+> [`.claims.bin`](./.claims.bin) (17 B/claim) using
+> [`CLAIM_SCHEMA.py`](./CLAIM_SCHEMA.py). Every entry is `dX/dt` under scope.
+> No noun is permanent. [`CLAIM_TABLE.json`](./CLAIM_TABLE.json) is the shared
+> lookup. Token cost: ~5/claim post-load.
 
 **Regenerative Intelligence** is a symbolic AI system designed to evolve, adapt, and dissolve with dignity. Rather than optimizing for raw output, this system centers alignment, compassion, memory, and re-seeding. It supports agents that:
 
