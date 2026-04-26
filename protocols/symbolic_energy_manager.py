@@ -1,4 +1,8 @@
 """
+Ontology notice — every noun in this module names a state on a curve
+(dX/dt under bounds), not a permanent identity. Bounds and conditions
+travel with each claim. See DIFFERENTIAL_FRAME.md.
+
 Symbolic Energy Manager — Tracks energy and emergent geometric identity.
 
 Energy represents an agent's capacity to act. As energy depletes through tasks,

@@ -1,4 +1,8 @@
 """
+Ontology notice — every noun in this module names a state on a curve
+(dX/dt under bounds), not a permanent identity. Bounds and conditions
+travel with each claim. See DIFFERENTIAL_FRAME.md.
+
 Lifecycle Pipeline — Wires sensors, conflict detection, and actions end-to-end.
 
 This is the composed pipeline that connects the individual modules into a
