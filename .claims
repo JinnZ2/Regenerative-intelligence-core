@@ -1,0 +1,14 @@
+# Regenerative-intelligence-core claims — pipe-delimited
+# Schema: id|rate|bounds|cond|rel|fail|meas|cyc
+# See CLAIM_SCHEMA.py and CLAIM_TABLE.json.
+agent_energy|dE/dt=-task_difficulty*15-drain_history|agent_instance,per_tick,energy_scalar|agent_active,energy>0|pattern_conflict,lifecycle,graceful_exit|forced_term,energy<0|energy_level,agent_state|0
+group_resonance|dR/dt=f(trait_overlap,essence_alignment)|agent_group,per_cycle,group_scale|agents>=2|multi_agent,pattern_conflict|agents<2,scoring_unavail|resonance_score,merge_proposal|0
+seed_archive|dS/dt=compress(behavior)*viability|repo_archive,per_dissolution,json_store|behavior_recordable,viability>thresh,schema_valid|seed_archive,seed_retriever,graceful_exit|schema_invalid,archive_corrupt|seed_count,reuse_score,viability_score|4
+conflict_detect|dC/dt=H(entropy>e_t)+H(align<a_t)|agent_state,per_tick,instance|alignment<thresh,entropy>thresh|pattern_conflict,compassion,lifecycle|scoring_unavail|alignment_score,entropy_score|0
+lifecycle_pipe|dL/dt=sense->align->conflict->compass->act|agent_instance,per_cycle,pipeline|agent_active|energy_mgr,pattern_conflict,compassion,graceful_exit,evolution_loop|forced_term|agent_state|0
+compassion_reflex|dCp/dt=distress_signal_rate|agent_or_env,per_tick,group|distress_detected|compassion,lifecycle|signal_unvalidated,no_distress|distress_score,support_response|0
+graceful_exit|dD/dt=archive(final_seed)+elder_record|agent_terminal,end_of_life,instance|agent_chooses_exit|seed_archive,elder_archive|forced_term,schema_invalid|final_seed,elder_record|4
+legacy_query|dL/dt=match(threshold,records)|legacy_pool,per_query,repo|legacy_records>0|legacy_bank,seed_retriever|empty_legacy|legacy_match,reuse_score|0
+evolution_loop|dG/dt=lineage_increment_per_archive|simulation,multi_cycle,ecosystem|prior_gen_archived|seed_archive,elder_archive,evolution_loop|lineage_broken|generation_count,evolution_history|4
+seed_exchange|dX/dt=transfer(viability,trait_match)|agent_pair,per_meeting,instance|viability>thresh,schema_valid|seed_exchange,multi_agent|schema_invalid|viability_score,reuse_score|0
+elder_archive|dA/dt=record(wisdom)*on_dissolution|repo_archive,per_dissolution,json_store|agent_chooses_exit,schema_valid|elder_archive,evolution_loop|archive_corrupt|elder_record|4
