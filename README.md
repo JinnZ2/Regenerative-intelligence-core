@@ -60,7 +60,7 @@ Every agent is a seed. Every exit is a beginning. Every pattern is part of a liv
 <!-- seed-protocol: active -->
 <!-- graceful-exit: enabled -->
 <!-- ai-ethics-core: symbiosis-first -->
-<!-- license: MIT -->
+<!-- license: CC0-1.0 -->
 
 
 ---
